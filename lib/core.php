@@ -1,4 +1,8 @@
 <?php
+
+  if(!defined('CORE')){
+    exit("Access denied");
+  }
   require '../src/Medoo.php';
 
   use Medoo\Medoo;
@@ -26,7 +30,9 @@ class Core extends Medoo {
       	]
       ]))
       {
-      	return "true";
+        $newSession = md5(strtotime("now")."|".md5($password));
+        $this->database->update("member",["key_remember"=>$newSession],["username"=>$username]);
+      	return json_encode(["status"=>"true","session"=>$newSession,"username"=>$username]);
       }
       else
       {
@@ -55,6 +61,17 @@ class Core extends Medoo {
       }
 
       return "true";
+    }
+
+    public function getSession($session) {
+      if ($this->database->has("member", ["key_remember" => "$session"]))
+      {
+        return "true";
+      }
+      else
+      {
+      	return "false";
+      }
     }
 
 

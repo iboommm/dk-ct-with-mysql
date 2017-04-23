@@ -1,6 +1,6 @@
-var app = angular.module("app",[]);
+var app = angular.module("app",['LocalStorageModule']);
 
-app.controller("controller",['$http','$scope',function($http,$scope) {
+app.controller("controller",['$http','$scope','localStorageService',function($http,$scope,localStorageService) {
   var app = $scope;
   var self = this;
 
@@ -9,6 +9,31 @@ app.controller("controller",['$http','$scope',function($http,$scope) {
   app.node = null
   app.pin = [];
 
+  this.initial = function() {
+    if(localStorageService.isSupported) {
+      localStorageService.set("session", localStorageService.get("session") == null ? null:localStorageService.get("session"));
+      console.log("OK");
+      console.log(localStorageService.get("session"));
+    }
+    var data = localStorageService.get("session") == "-" ? "-" : localStorageService.get("session");
+    var session = {"session":data};
+    var promise = $http.post("api/session",session);
+    promise.then(
+      function(respond) {
+        // console.log(respond.data);
+        if(respond.data == "true") {
+          self.loadNode();
+        }
+      }
+    )
+    promise.catch(
+      function() {
+          console.log("err");
+      }
+    )
+  }
+  this.initial();
+
   app.login = function() {
     var data = {username:app.username,password:app.password};
     // console.log(data);
@@ -16,8 +41,11 @@ app.controller("controller",['$http','$scope',function($http,$scope) {
     promise.then(
       function(respond) {
         console.log(respond.data);
-        if(respond.data == "true") {
+        if(respond.data.status == "true") {
           self.loadNode();
+          localStorageService.set("session", respond.data.session);
+          localStorageService.set("username", respond.data.username);
+          app.username = localStorageService.get("username");
         }
       }
     )
@@ -102,4 +130,16 @@ app.controller("controller",['$http','$scope',function($http,$scope) {
     return decodeURIComponent(escape(window.atob( str )));
   }
 
+  app.logout = function() {
+    localStorageService.clearAll();
+    location.reload();
+  }
+
 }]);
+
+app.config(function (localStorageServiceProvider) {
+  localStorageServiceProvider
+    .setPrefix('myApp')
+    .setStorageType('sessionStorage')
+    .setNotify(true, true)
+});

@@ -1,5 +1,7 @@
 <?php
 
+  define('CORE', '1');
+
   require '../src/flight/Flight.php';
   require '../lib/core.php';
 
@@ -29,6 +31,13 @@
     $encode = json_decode($rawData);
     $core = new Core();
     echo $core->update($encode);
+  });
+
+  Flight::route('POST /session', function(){
+    $rawData = file_get_contents("php://input");
+    $encode = json_decode($rawData);
+    $core = new Core();
+    echo $core->getSession($encode->session);
   });
 
 
