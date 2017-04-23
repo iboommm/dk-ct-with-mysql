@@ -8,6 +8,7 @@ app.controller("controller",['$http','$scope','localStorageService',function($ht
   app.password = "123";
   app.node = null
   app.pin = [];
+  app.removeTMP = [];
 
   this.initial = function() {
     if(localStorageService.isSupported) {
@@ -58,8 +59,10 @@ app.controller("controller",['$http','$scope','localStorageService',function($ht
         // console.log(respond.data);
         angular.forEach(respond.data, function(value, key) {
           self.loadPin(value.id)
+          value.isShow = false;
         });
         app.node = respond.data;
+        console.log(app.node);
       }
     )
     promise.catch(
@@ -135,7 +138,61 @@ app.controller("controller",['$http','$scope','localStorageService',function($ht
     location.reload();
   }
 
+  app.addNode = function() {
+    var data = {name:app.newNode,ip:app.newIP,number:app.newPin};
+    self.resetNewNode();
+    var promise = $http.post("api/addNode",data);
+    promise.then(
+      function(respond) {
+        console.log(respond.data);
+        self.loadNode();
+        $("#addNode").modal("hide");
+      }
+    )
+    promise.catch(
+      function() {
+          console.log("err");
+      }
+    )
+  }
+
+  app.confirmDeleteNode = function(node) {
+    $("#confirmDeleteNode").modal("show");
+    $("#removeNode").modal("hide");
+    app.removeTMP = node;
+  }
+
+  app.cancelRemove = function() {
+    app.removeTMP = [];
+    $("#confirmDeleteNode").modal("hide");
+    $("#removeNode").modal("show");
+  }
+
+  app.removeNode = function(node_id) {
+    var data = {"node_id":node_id};
+    var promise = $http.post("api/removeNode",data);
+    promise.then(
+      function(respond) {
+        // console.log(respond.data);
+        self.loadNode();
+        $("#confirmDeleteNode").modal("hide");
+      }
+    )
+    promise.catch(
+      function() {
+          console.log("err");
+      }
+    )
+  }
+
+  self.resetNewNode = function() {
+    app.newNode = "";
+    app.newIP = "";
+    app.newPin = "";
+  }
+
 }]);
+
 
 app.config(function (localStorageServiceProvider) {
   localStorageServiceProvider

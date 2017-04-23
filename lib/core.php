@@ -74,6 +74,43 @@ class Core extends Medoo {
       }
     }
 
+    public function removeNode($node_id) {
+      $chkErr = $this->database->delete("pin", ["node_id"=>$node_id]);
+      if(!$chkErr) {
+        return "false";
+      }
+      $chkErr = $this->database->delete("node", ["id"=>$node_id]);
+      if(!$chkErr) {
+        return "false";
+      }
+      return "true $node_id";
+    }
+
+    public function addNode($name,$ip,$number) {
+      $chkErr = true;
+      $chkErr = $this->database->insert("node", [
+      	"name" => "$name",
+      	"ip" => "$ip"
+      ]);
+      if(!$chkErr) {
+        return "false";
+      }
+      $node_id = $this->database->id();
+      $i=0;
+      while($i < $number) {
+        $chkErr = $this->database->insert("pin", [
+          "pin_id" => $i++,
+          "node_id"=> $node_id,
+          "status"=> 0,
+          "switch"=> 0,
+        ]);
+        if(!$chkErr) {
+          return "false";
+        }
+      }
+      return "true";
+    }
+
 
   }
 

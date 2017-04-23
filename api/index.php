@@ -40,6 +40,20 @@
     echo $core->getSession($encode->session);
   });
 
+  Flight::route('POST /addNode', function(){
+    $rawData = file_get_contents("php://input");
+    $encode = json_decode($rawData);
+    $core = new Core();
+    echo $core->addNode($encode->name,$encode->ip,$encode->number);
+  });
+
+  Flight::route('POST /removeNode', function(){
+    $rawData = file_get_contents("php://input");
+    $encode = json_decode($rawData);
+    $core = new Core();
+    echo $core->removeNode($encode->node_id);
+  });
+
 
   Flight::start();
 
