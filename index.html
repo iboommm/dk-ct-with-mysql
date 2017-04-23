@@ -8,13 +8,15 @@
     <link rel="stylesheet" href="css/app.css" />
     <link rel="stylesheet" href="css/font-awesome.css" />
     <link rel="stylesheet" href="css/tether.min.css" />
-		<link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="css/animate.css">
+		<link rel="stylesheet" href="css/angular-ui-notification.min.css">
 
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/tether.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/angular.min.js"></script>
-		<script type="text/javascript" src="js/angular-local-storage.min.js"></script>
+    <script type="text/javascript" src="js/angular-local-storage.min.js"></script>
+		<script type="text/javascript" src="js/angular-ui-notification.min.js"></script>
     <script type="text/javascript" src="app.js"></script>
 
     </script>
@@ -42,56 +44,60 @@
             </div>
 
             <div id="control" class="container" ng-if="node != null">
-									<div class="col-12 text-right">
-										<h2>
+                <div class="col-12 text-right">
+                    <h2>
 											<span class="badge badge-default"><i class="fa fa-user-circle-o" aria-hidden="true"></i> Login as {{ username }}</span>
 											<button class="btn btn-primary" ng-click="goAdmin()"><i class="fa fa-cog" aria-hidden="true"></i> Admin Control</button>
 											<button class="btn btn-primary" ng-click="changePassword()"><i class="fa fa-lock" aria-hidden="true"></i> Change Password</button>
 											| <button class="btn btn-default" ng-click="logout()"><i class="fa fa-sign-out" aria-hidden="true"></i> Sign out</button>
 										</h2>
 
-									</div>
+                </div>
                 <div class="jumbotron">
-									<div class="col-12 plus-button">
-											<button class="btn btn-primary" data-toggle="modal" data-target="#addNode"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add Node</button>
-											<button class="btn btn-danger" data-toggle="modal" data-target="#removeNode"><i class="fa fa-minus-circle" aria-hidden="true"></i> Remove Node</button>
-									</div>
-                    <div class="card" ng-repeat="a in node" id="node-{{$index}}" >
+                    <div class="col-12 plus-button">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#addNode"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add Node</button>
+                        <button class="btn btn-danger" data-toggle="modal" data-target="#removeNode"><i class="fa fa-minus-circle" aria-hidden="true"></i> Remove Node</button>
+                    </div>
+                    <div class="card" ng-repeat="a in node" id="node-{{$index}}">
                         <div class="card-header">
-													<div class="row">
-													<div class="col-md-8 text-left">
-                          	Name : <input type="text" ng-model="a.name" ng-change="update()" /> |
-														IP :<input type="text" ng-model="a.ip" ng-change="update()" />
-														</div>
-														<div class="col-md-4 text-right">
-															<button class="btn btn-info" ng-click="a.isShow = !a.isShow"><i class="fa fa-chevron-down" aria-hidden="true"></i> Expand</button>
-														</div>
-														</div>
+                            <div class="row">
+                                <div class="col-md-8 text-left">
+                                    Name :
+                                    <input type="text" ng-model="a.name" ng-change="update()" /> | IP :
+                                    <input type="text" ng-model="a.ip" ng-change="update()" />
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <button class="btn btn-info" ng-click="a.isShow = !a.isShow"><i class="fa fa-chevron-down" aria-hidden="true"></i> Expand</button>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-block" ng-if="a.isShow == true">
-													<h3>Activate PIN</h3>
-													<ul class="list-group">
-													  <li class="list-group-item" ng-repeat="pin in pin[a.id] | orderBy: pin_id" ng-if="pin.switch == 1">
-															<div class="col-6">
-																Pin {{pin.pin_id}} <br />
-																Status : {{ status(pin.status) }} <br />
-															</div>
-															<div class="col-6">
-																<button class="btn" ng-class="pin.status == 1 ? 'btn-primary':'btn-default'" ng-click="pin.status = 1;setPin(pin,a);update();"><i class="fa fa-check-circle" aria-hidden="true"></i> ON</button>
-																<button class="btn" ng-class="pin.status == 0 ? 'btn-primary':'btn-default'" ng-click="pin.status = 0;setPin(pin,a);update();"><i class="fa fa-times-circle" aria-hidden="true"></i> OFF</button>
-																|
-																<button class="btn btn-danger" ng-click="pin.switch = 0;pin.status = 0;update();"><i class="fa fa-power-off" aria-hidden="true"></i> Deactivate</button>
-															</div>
-														</li>
-													</ul>
-													<br />
-													<h3>Deactivate PIN</h3>
-													<ul class="list-group">
-														<li class="list-group-item" ng-repeat="pin in pin[a.id] | orderBy: 'pin_id'" ng-if="pin.switch == 0">
-															<div class="col-6">Pin {{pin.pin_id}} </div>
-															<div class="col-6"><button class="btn btn-success" ng-click="pin.switch = 1;update();"><i class="fa fa-power-off" aria-hidden="true"></i> Active</button></div>
-														</li>
-													</ul>
+                            <h3>Activate PIN</h3>
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="pin in pin[a.id] | orderBy: pin_id" ng-if="pin.switch == 1">
+                                    <div class="col-6">
+                                        Pin {{pin.pin_id}}
+                                        <br /> Status : {{ status(pin.status) }}
+                                        <br />
+                                    </div>
+                                    <div class="col-6">
+                                        <button class="btn" ng-class="pin.status == 1 ? 'btn-primary':'btn-default'" ng-click="pin.status = 1;setPin(pin,a);update();"><i class="fa fa-check-circle" aria-hidden="true"></i> ON</button>
+                                        <button class="btn" ng-class="pin.status == 0 ? 'btn-primary':'btn-default'" ng-click="pin.status = 0;setPin(pin,a);update();"><i class="fa fa-times-circle" aria-hidden="true"></i> OFF</button>
+                                        |
+                                        <button class="btn btn-danger" ng-click="pin.switch = 0;pin.status = 0;update();"><i class="fa fa-power-off" aria-hidden="true"></i> Deactivate</button>
+                                    </div>
+                                </li>
+                            </ul>
+                            <br />
+                            <h3>Deactivate PIN</h3>
+                            <ul class="list-group">
+                                <li class="list-group-item" ng-repeat="pin in pin[a.id] | orderBy: 'pin_id'" ng-if="pin.switch == 0">
+                                    <div class="col-6">Pin {{pin.pin_id}} </div>
+                                    <div class="col-6">
+                                        <button class="btn btn-success" ng-click="pin.switch = 1;update();"><i class="fa fa-power-off" aria-hidden="true"></i> Active</button>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -100,78 +106,79 @@
 
     </div>
 
-		<div class="modal fade" id="addNode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Node</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="new-name" class="form-control-label">Name :</label>
-            <input type="text" class="form-control" ng-model="newNode" placeholder="Enter name">
-          </div>
-					<div class="form-group">
-            <label for="new-ip" class="form-control-label">IP :</label>
-            <input type="text" class="form-control" ng-model="newIP" placeholder="Enter IP Address">
-          </div>
-					<div class="form-group">
-						<label for="new-ip" class="form-control-label">Number of Pin :</label>
-						<input type="number" class="form-control" ng-model="newPin" placeholder="Enter number of pin">
-					</div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
-        <button type="button" class="btn btn-primary" ng-click="addNode()"><i class="fa fa-check-circle" aria-hidden="true"></i> Submit</button>
-      </div>
+    <div class="modal fade" id="addNode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Node</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="new-name" class="form-control-label">Name :</label>
+                            <input type="text" class="form-control" ng-model="newNode" placeholder="Enter name">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-ip" class="form-control-label">IP :</label>
+                            <input type="text" class="form-control" ng-model="newIP" placeholder="Enter IP Address">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-ip" class="form-control-label">Number of Pin :</label>
+                            <input type="number" class="form-control" ng-model="newPin" placeholder="Enter number of pin">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
+                    <button type="button" class="btn btn-primary" ng-click="addNode()"><i class="fa fa-check-circle" aria-hidden="true"></i> Submit</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-<div class="modal fade" id="removeNode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-<div class="modal-dialog" role="document">
-<div class="modal-content">
-	<div class="modal-header">
-		<h5 class="modal-title" id="exampleModalLabel">Remove Node</h5>
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		</button>
-	</div>
-	<div class="modal-body">
-		<form>
-			<ul class="list-group">
-			  <li class="list-group-item" ng-repeat="a in node">
-					<div class="col-8">{{ a.name }}</div>
-					<div class="col-4">
-						<button class="btn btn-danger" ng-click="confirmDeleteNode(a)">
-							<i class="fa fa-times-circle" aria-hidden="true"></i>  Remove
-						</button>
-					</div></li>
-			</ul>
-		</form>
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
-	</div>
-</div>
-</div>
-</div>
-<div class="modal fade" id="confirmDeleteNode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-body">
-        Do you want to remove {{ removeTMP.name }}
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" ng-click="cancelRemove()"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
-        <button type="button" class="btn btn-danger"  ng-click="removeNode(removeTMP.id)"><i class="fa fa-check-circle" aria-hidden="true"></i> Remove</button>
-      </div>
+    <div class="modal fade" id="removeNode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Remove Node</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <ul class="list-group">
+                            <li class="list-group-item" ng-repeat="a in node">
+                                <div class="col-8">{{ a.name }}</div>
+                                <div class="col-4">
+                                    <button class="btn btn-danger" ng-click="confirmDeleteNode(a)">
+                                        <i class="fa fa-times-circle" aria-hidden="true"></i> Remove
+                                    </button>
+                                </div>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+    <div class="modal fade" id="confirmDeleteNode" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    Do you want to remove {{ removeTMP.name }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" ng-click="cancelRemove()"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
+                    <button type="button" class="btn btn-danger" ng-click="removeNode(removeTMP.id)"><i class="fa fa-check-circle" aria-hidden="true"></i> Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

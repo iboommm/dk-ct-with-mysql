@@ -1,6 +1,6 @@
-var app = angular.module("app",['LocalStorageModule']);
+var app = angular.module("app",['LocalStorageModule','ui-notification']);
 
-app.controller("controller",['$http','$scope','localStorageService',function($http,$scope,localStorageService) {
+app.controller("controller",['$http','$scope','localStorageService','Notification',function($http,$scope,localStorageService,Notification) {
   var app = $scope;
   var self = this;
 
@@ -9,6 +9,9 @@ app.controller("controller",['$http','$scope','localStorageService',function($ht
   app.node = null
   app.pin = [];
   app.removeTMP = [];
+  app.newNode = "";
+  app.newIP = "";
+  app.newPin = 8;
 
   this.initial = function() {
     if(localStorageService.isSupported) {
@@ -47,6 +50,7 @@ app.controller("controller",['$http','$scope','localStorageService',function($ht
           localStorageService.set("session", respond.data.session);
           localStorageService.set("username", respond.data.username);
           app.username = localStorageService.get("username");
+          Notification.success('Login Success');
         }
       }
     )
@@ -139,6 +143,11 @@ app.controller("controller",['$http','$scope','localStorageService',function($ht
   }
 
   app.addNode = function() {
+
+    if(app.newNode == "" || app.newIP == "" || app.newPin == "") {
+      Notification.error("Please enter value");
+      return;
+    }
     var data = {name:app.newNode,ip:app.newIP,number:app.newPin};
     self.resetNewNode();
     var promise = $http.post("api/addNode",data);
@@ -147,6 +156,7 @@ app.controller("controller",['$http','$scope','localStorageService',function($ht
         console.log(respond.data);
         self.loadNode();
         $("#addNode").modal("hide");
+        Notification.success('Add Node Success');
       }
     )
     promise.catch(
@@ -176,6 +186,7 @@ app.controller("controller",['$http','$scope','localStorageService',function($ht
         // console.log(respond.data);
         self.loadNode();
         $("#confirmDeleteNode").modal("hide");
+        Notification.success('Remove Node Success');
       }
     )
     promise.catch(
@@ -188,15 +199,25 @@ app.controller("controller",['$http','$scope','localStorageService',function($ht
   self.resetNewNode = function() {
     app.newNode = "";
     app.newIP = "";
-    app.newPin = "";
+    app.newPin = "8";
   }
 
 }]);
 
 
-app.config(function (localStorageServiceProvider) {
+app.config(function (localStorageServiceProvider,NotificationProvider) {
   localStorageServiceProvider
     .setPrefix('myApp')
     .setStorageType('sessionStorage')
     .setNotify(true, true)
+
+    NotificationProvider.setOptions({
+            delay: 5000,
+            startTop: 20,
+            startRight: 10,
+            verticalSpacing: 20,
+            horizontalSpacing: 20,
+            positionX: 'right',
+            positionY: 'top'
+        });
 });
