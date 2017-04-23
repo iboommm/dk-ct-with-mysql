@@ -55,8 +55,8 @@
 																Status : {{ status(pin.status) }} <br />
 															</div>
 															<div class="col-6">
-																<button class="btn" ng-class="pin.status == 1 ? 'btn-primary':'btn-default'" ng-click="pin.status = 1;update();">ON</button>
-																<button class="btn" ng-class="pin.status == 0 ? 'btn-primary':'btn-default'" ng-click="pin.status = 0;update();">OFF</button>
+																<button class="btn" ng-class="pin.status == 1 ? 'btn-primary':'btn-default'" ng-click="pin.status = 1;setPin(pin,a);update();">ON</button>
+																<button class="btn" ng-class="pin.status == 0 ? 'btn-primary':'btn-default'" ng-click="pin.status = 0;setPin(pin,a);update();">OFF</button>
 																<button class="btn btn-danger" ng-click="pin.switch = 0;pin.status = 0;update();">Deactivate</button>
 															</div>
 														</li>

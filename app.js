@@ -72,6 +72,24 @@ app.controller("controller",['$http','$scope',function($http,$scope) {
     )
   }
 
+  app.setPin = function(pin,node) {
+    var ip = node.ip;
+    var status = pin.status == 1 ? 1:0;
+    console.log("new Status : " + status);
+    console.log("http://" + ip + "/digital/" + pin.pin_id + "/" + status);
+    var promise = $http.get("http://" + ip + "/digital/" + pin.pin_id + "/" + status);
+    promise.then(
+      function(respond) {
+        console.log(respond.data);
+      }
+    )
+    promise.catch(
+      function() {
+          console.log("err");
+      }
+    )
+  }
+
   app.status = function(status) {
     return status == 1 ? "ON" : "OFF";
   }
