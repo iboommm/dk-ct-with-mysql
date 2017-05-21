@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set("Asia/Bangkok");
 
   if(!defined('CORE')){
     exit("Access denied");
@@ -42,7 +43,7 @@ class Core extends Medoo {
     }
 
     public function loadNode() {
-      $datas = $this->database->select("node","*");
+      $datas = $this->database->query("SELECT node_active.id,node_active.name,node_active.status,mcu.ip,pin.pin_id FROM node_active LEFT JOIN mcu ON mcu.id = node_active.mcu_id LEFT JOIN pin ON pin.id = node_active.pin_id")->fetchAll();;
       return json_encode($datas);
     }
 
@@ -50,14 +51,66 @@ class Core extends Medoo {
       $datas = $this->database->select("pin","*",["node_id"=>$node]);
       return json_encode($datas);
     }
+
+    public function updateMCU($data) {
+      $chkErr = true;
+      $test = "";
+      foreach ($data->mcu as $key => $value) {
+        if(isset($value->id)) {
+          if(isset($value->delete) && $value->delete == true) {
+            $result = $this->database->query("DELETE FROM `pin` WHERE `node_id` = $value->id");
+            if($result) {
+              $chkErr = $this->database->delete("mcu", ["id"=>$value->id]);
+            }
+            continue;
+          }
+          $chkErr = $this->database->update("mcu",
+          [
+            "name" => $value->name,
+            "ip"=> $value->ip,
+            "update_time" => date('Y-m-d H:i:s')
+          ]
+          ,["id"=> $value->id]);
+        }else {
+          $this->database->insert("mcu",
+          [
+            "name" => $value->name,
+            "ip"=> $value->ip,
+            "update_time" => date('Y-m-d H:i:s')
+          ]);
+          $i = 0;
+          $idLastest = $this->database->id();
+          while($i < 8) {
+            $this->database->insert("pin",
+            [
+              'pin_id'=> $i,
+              'node_id'=> $idLastest,
+              'status' => 0,
+              'switch' => 1
+          ]);
+          $i++;
+          }
+        }
+        // $test .= $value->id;
+
+      }
+      // return json_encode($idLastest);
+      if(!$chkErr) {
+        return "false";
+      }
+      return "true";
+    }
+
+    public function loadMCU() {
+      $datas = $this->database->select("mcu","*");
+      return json_encode($datas);
+    }
+
     public function update($data) {
       // return json_encode($data);
       $finish = 0;
       foreach ($data->node as $key => $value) {
-        $this->database->update("node",["name"=>$value->name,"ip"=>$value->ip,"update_time"=> strtotime("now")],["id"=>$value->id]);
-        foreach ($data->pin[$value->id] as $key => $value) {
-          $this->database->update("pin",["status"=>$value->status,"switch"=>$value->switch],["id"=>$value->id]);
-        }
+        $this->database->update("node_active",["name"=>$value->name],["id"=>$value->id]);
       }
 
       return "true";
@@ -75,40 +128,40 @@ class Core extends Medoo {
     }
 
     public function removeNode($node_id) {
-      $chkErr = $this->database->delete("pin", ["node_id"=>$node_id]);
+      $chkErr = $this->database->delete("node_active", ["id"=>$node_id]);
       if(!$chkErr) {
         return "false";
-      }
-      $chkErr = $this->database->delete("node", ["id"=>$node_id]);
-      if(!$chkErr) {
-        return "false";
-      }
-      return "true $node_id";
-    }
-
-    public function addNode($name,$ip,$number) {
-      $chkErr = true;
-      $chkErr = $this->database->insert("node", [
-      	"name" => "$name",
-      	"ip" => "$ip"
-      ]);
-      if(!$chkErr) {
-        return "false";
-      }
-      $node_id = $this->database->id();
-      $i=0;
-      while($i < $number) {
-        $chkErr = $this->database->insert("pin", [
-          "pin_id" => $i++,
-          "node_id"=> $node_id,
-          "status"=> 0,
-          "switch"=> 0,
-        ]);
-        if(!$chkErr) {
-          return "false";
-        }
       }
       return "true";
+    }
+
+    public function switchNode($item) {
+      $item->status = !$item->status;
+      $chkErr = $this->database->update("node_active",["status" => $item->status],["id"=>$item->id]);
+      if(!$chkErr) {
+        return "false";
+      }
+      return "true";
+      // return json_encode($item->status);
+    }
+
+    public function addNode($name) {
+      $chkErr = true;
+      $number = $this->database->select("pin","id",["status[!]" => 1]);
+      $id = $number[array_rand($number,1)];
+
+      $mcu_id = $this->database->get("pin","node_id",["id[=]" => $id]);
+
+      $chkErr = $this->database->insert("node_active",[
+        "name" => $name,
+        "status" => 1,
+        "mcu_id" => $mcu_id,
+        "pin_id" => $id
+      ]);
+
+
+      return json_encode($mcu_id);
+
     }
 
 

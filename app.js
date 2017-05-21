@@ -8,6 +8,7 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   app.password = "123";
   app.node = null
   app.pin = [];
+  app.mcu = [];
   app.removeTMP = [];
   app.newNode = "";
   app.newIP = "";
@@ -27,6 +28,7 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
         // console.log(respond.data);
         if(respond.data == "true") {
           self.loadNode();
+          self.loadMCU();
         }
       }
     )
@@ -60,13 +62,13 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
     var promise = $http.post("api/node");
     promise.then(
       function(respond) {
-        // console.log(respond.data);
+        // console.log("1" , respond.data);
         angular.forEach(respond.data, function(value, key) {
-          self.loadPin(value.id)
-          value.isShow = false;
+          value.ip = value.ip + "/digital/" + value.pin_id
         });
         app.node = respond.data;
-        console.log(app.node);
+        Notification.success('Load Node Success');
+        // console.log("1" , app.node);
       }
     )
     promise.catch(
@@ -76,13 +78,33 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
     )
   }
 
-  self.loadPin = function(node) {
-    var data = {"node":node};
-    var promise = $http.post("api/pin",data);
+  self.loadMCU = function(data) {
+    var promise = $http.post("api/mcu");
+    promise.then(
+      function(respond) {
+        // console.log("1" , respond.data);
+        app.mcu = respond.data;
+        // console.log("1" , app.node);
+      }
+    )
+    promise.catch(
+      function() {
+          console.log("err");
+      }
+    )
+  }
+
+
+
+  app.switch = function(item) {
+    // console.log(item.status);
+    var data = {item};
+    var promise = $http.post("api/switch",data);
     promise.then(
       function(respond) {
         // console.log(respond.data);
-        app.pin[node] = respond.data;
+        self.loadNode();
+
       }
     )
     promise.catch(
@@ -93,7 +115,7 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   }
 
   app.update = function() {
-    var data = {node:app.node,pin: app.pin};
+    var data = {node:app.node};
     var promise = $http.post("api/update",data);
     promise.then(
       function(respond) {
@@ -105,6 +127,28 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
           console.log("err");
       }
     )
+  }
+
+  app.updateMachine = function() {
+    var data = {mcu:app.mcu};
+    var promise = $http.post("api/updateMachine",data);
+    promise.then(
+      function(respond) {
+        self.loadMCU();
+        if(respond.data == "true") {
+          Notification.success('Update Machine Success');
+        }
+      }
+    )
+    promise.catch(
+      function() {
+          console.log("err");
+      }
+    )
+  }
+
+  app.goAdmin = function() {
+    $("#adminControl").modal("show");
   }
 
   app.setPin = function(pin,node) {
@@ -144,16 +188,16 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
 
   app.addNode = function() {
 
-    if(app.newNode == "" || app.newIP == "" || app.newPin == "") {
+    if(app.newNode == "" ) {
       Notification.error("Please enter value");
       return;
     }
-    var data = {name:app.newNode,ip:app.newIP,number:app.newPin};
+    var data = {name:app.newNode};
     self.resetNewNode();
     var promise = $http.post("api/addNode",data);
     promise.then(
       function(respond) {
-        console.log(respond.data);
+        console.log("2131" , respond.data);
         self.loadNode();
         $("#addNode").modal("hide");
         Notification.success('Add Node Success');
@@ -168,14 +212,12 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
 
   app.confirmDeleteNode = function(node) {
     $("#confirmDeleteNode").modal("show");
-    $("#removeNode").modal("hide");
     app.removeTMP = node;
   }
 
   app.cancelRemove = function() {
     app.removeTMP = [];
     $("#confirmDeleteNode").modal("hide");
-    $("#removeNode").modal("show");
   }
 
   app.removeNode = function(node_id) {
@@ -198,8 +240,6 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
 
   self.resetNewNode = function() {
     app.newNode = "";
-    app.newIP = "";
-    app.newPin = "8";
   }
 
 }]);

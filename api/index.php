@@ -44,7 +44,7 @@
     $rawData = file_get_contents("php://input");
     $encode = json_decode($rawData);
     $core = new Core();
-    echo $core->addNode($encode->name,$encode->ip,$encode->number);
+    echo $core->addNode($encode->name);
   });
 
   Flight::route('POST /removeNode', function(){
@@ -53,6 +53,26 @@
     $core = new Core();
     echo $core->removeNode($encode->node_id);
   });
+
+  Flight::route('POST /switch', function(){
+    $rawData = file_get_contents("php://input");
+    $encode = json_decode($rawData);
+    $core = new Core();
+    echo $core->switchNode($encode->item);
+  });
+
+  Flight::route('POST /mcu', function(){
+    $core = new Core();
+    echo $core->loadMCU();
+  });
+
+  Flight::route('POST /updateMachine', function(){
+    $rawData = file_get_contents("php://input");
+    $encode = json_decode($rawData);
+    $core = new Core();
+    echo $core->updateMCU($encode);
+  });
+
 
 
   Flight::start();

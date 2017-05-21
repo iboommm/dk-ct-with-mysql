@@ -56,49 +56,25 @@
                 <div class="jumbotron">
                     <div class="col-12 plus-button">
                         <button class="btn btn-primary" data-toggle="modal" data-target="#addNode"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add Node</button>
-                        <button class="btn btn-danger" data-toggle="modal" data-target="#removeNode"><i class="fa fa-minus-circle" aria-hidden="true"></i> Remove Node</button>
                     </div>
                     <div class="card" ng-repeat="a in node" id="node-{{$index}}">
                         <div class="card-header">
                             <div class="row">
                                 <div class="col-md-8 text-left">
                                     Name :
-                                    <input type="text" ng-model="a.name" ng-change="update()" /> | IP :
-                                    <input type="text" ng-model="a.ip" ng-change="update()" />
+                                    <input type="text" ng-model="a.name" ng-change="update()" /> 
+                                    <span class="badge badge-default">IP : {{ a.ip }}</span>
                                 </div>
                                 <div class="col-md-4 text-right">
-                                    <button class="btn btn-info" ng-click="a.isShow = !a.isShow"><i class="fa fa-chevron-down" aria-hidden="true"></i> Expand</button>
+                                    <button class="btn" ng-click="switch(a)" ng-class="{'btn-success' : a.status == 1,'btn-danger' : a.status == 0}">
+                                      <span ng-if="a.status == 1">ON</span>
+                                      <span ng-if="a.status == 0">OFF</span>
+                                    </button>
+                                    <button class="btn btn-danger" ng-click="confirmDeleteNode(a)"><i class="fa fa-trash"></i> </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-block" ng-if="a.isShow == true">
-                            <h3>Activate PIN</h3>
-                            <ul class="list-group">
-                                <li class="list-group-item" ng-repeat="pin in pin[a.id] | orderBy: pin_id" ng-if="pin.switch == 1">
-                                    <div class="col-6">
-                                        Pin {{pin.pin_id}}
-                                        <br /> Status : {{ status(pin.status) }}
-                                        <br />
-                                    </div>
-                                    <div class="col-6">
-                                        <button class="btn" ng-class="pin.status == 1 ? 'btn-primary':'btn-default'" ng-click="pin.status = 1;setPin(pin,a);update();"><i class="fa fa-check-circle" aria-hidden="true"></i> ON</button>
-                                        <button class="btn" ng-class="pin.status == 0 ? 'btn-primary':'btn-default'" ng-click="pin.status = 0;setPin(pin,a);update();"><i class="fa fa-times-circle" aria-hidden="true"></i> OFF</button>
-                                        |
-                                        <button class="btn btn-danger" ng-click="pin.switch = 0;pin.status = 0;update();"><i class="fa fa-power-off" aria-hidden="true"></i> Deactivate</button>
-                                    </div>
-                                </li>
-                            </ul>
-                            <br />
-                            <h3>Deactivate PIN</h3>
-                            <ul class="list-group">
-                                <li class="list-group-item" ng-repeat="pin in pin[a.id] | orderBy: 'pin_id'" ng-if="pin.switch == 0">
-                                    <div class="col-6">Pin {{pin.pin_id}} </div>
-                                    <div class="col-6">
-                                        <button class="btn btn-success" ng-click="pin.switch = 1;update();"><i class="fa fa-power-off" aria-hidden="true"></i> Active</button>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -120,14 +96,6 @@
                         <div class="form-group">
                             <label for="new-name" class="form-control-label">Name :</label>
                             <input type="text" class="form-control" ng-model="newNode" placeholder="Enter name">
-                        </div>
-                        <div class="form-group">
-                            <label for="new-ip" class="form-control-label">IP :</label>
-                            <input type="text" class="form-control" ng-model="newIP" placeholder="Enter IP Address">
-                        </div>
-                        <div class="form-group">
-                            <label for="new-ip" class="form-control-label">Number of Pin :</label>
-                            <input type="number" class="form-control" ng-model="newPin" placeholder="Enter number of pin">
                         </div>
                     </form>
                 </div>
@@ -177,6 +145,45 @@
                     <button type="button" class="btn btn-danger" ng-click="removeNode(removeTMP.id)"><i class="fa fa-check-circle" aria-hidden="true"></i> Remove</button>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="modal fade" id="adminControl" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Control Panel</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                <div class="card" ng-repeat="a in mcu" id="node-{{$index}}">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-8 text-left">
+                                Name :
+                                <input type="text" ng-model="a.name" />
+                                | IP :
+                                <input type="text" ng-model="a.ip" />
+                            </div>
+                            <div class="col-md-4 text-right">
+                                <button class="btn" ng-show="a.id != null" ng-class="{'btn-danger': a.delete == true,'btn-default': a.delete == false}" ng-click="a.delete = !a.delete">
+                                  <i class="fa fa-times"></i>
+                                </button>
+                                <button class="btn" ng-show="a.id == null" ng-class="{'btn-danger': a.delete == true,'btn-default': a.delete == false}" ng-click="mcu.splice($index,1)">
+                                  <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-default" ng-click="mcu.push({name:'',ip:''})"> <i class="fa fa-plus"></i> Add Machine</button>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-primary" ng-click="updateMachine()"> <i class="fa fa-check"></i> Update</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
+              </div>
+          </div>
         </div>
     </div>
 </body>
