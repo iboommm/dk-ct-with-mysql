@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 24, 2017 at 12:57 AM
+-- Generation Time: May 21, 2017 at 05:15 AM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 5.6.30
 
@@ -19,6 +19,27 @@ SET time_zone = "+00:00";
 --
 -- Database: `dk_ct`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mcu`
+--
+
+CREATE TABLE `mcu` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `ip` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `mcu`
+--
+
+INSERT INTO `mcu` (`id`, `name`, `ip`, `update_time`) VALUES
+(10, 'M1', '172.20.10.12', '2017-05-15 09:17:11'),
+(22, 'M2', '172.20.10.13', '2017-05-15 09:17:11');
 
 -- --------------------------------------------------------
 
@@ -40,28 +61,31 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`id`, `username`, `password`, `key_remember`, `create_time`, `update_time`) VALUES
-(1, 'Admin', '202cb962ac59075b964b07152d234b70', '79a38ead8af66b1188642d7e2a86a08f', '2017-04-23 22:44:15', '0000-00-00 00:00:00');
+(1, 'Admin', '202cb962ac59075b964b07152d234b70', 'da3e1869f4474d78a2ce8966d8f9ef3a', '2017-05-15 08:44:58', '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `node`
+-- Table structure for table `node_active`
 --
 
-CREATE TABLE `node` (
+CREATE TABLE `node_active` (
   `id` int(11) NOT NULL,
-  `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `ip` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `name` varchar(120) COLLATE utf8_unicode_ci NOT NULL,
+  `status` int(11) NOT NULL,
+  `mcu_id` int(11) NOT NULL,
+  `pin_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Dumping data for table `node`
+-- Dumping data for table `node_active`
 --
 
-INSERT INTO `node` (`id`, `name`, `ip`, `update_time`) VALUES
-(1, 'Node 1', '172.20.10.12', '0000-00-00 00:00:00'),
-(9, 'Node 2', '172.20.10.13', '0000-00-00 00:00:00');
+INSERT INTO `node_active` (`id`, `name`, `status`, `mcu_id`, `pin_id`) VALUES
+(1, 'Node 1', 1, 10, 30),
+(4, 'Node 3', 1, 10, 37),
+(10, 'Node 5', 1, 10, 34),
+(15, 'Node 6', 1, 10, 37);
 
 -- --------------------------------------------------------
 
@@ -75,33 +99,39 @@ CREATE TABLE `pin` (
   `node_id` int(11) NOT NULL,
   `status` int(11) NOT NULL,
   `switch` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
 
 --
 -- Dumping data for table `pin`
 --
 
 INSERT INTO `pin` (`id`, `pin_id`, `node_id`, `status`, `switch`) VALUES
-(1, 1, 1, 0, 1),
-(2, 2, 1, 0, 0),
-(3, 3, 1, 1, 1),
-(4, 4, 1, 0, 0),
-(5, 5, 1, 0, 0),
-(6, 6, 1, 0, 0),
-(8, 8, 1, 0, 0),
-(13, 7, 1, 0, 0),
-(22, 0, 9, 0, 0),
-(23, 1, 9, 0, 0),
-(24, 2, 9, 0, 0),
-(25, 3, 9, 0, 0),
-(26, 4, 9, 0, 1),
-(27, 5, 9, 0, 0),
-(28, 6, 9, 0, 0),
-(29, 7, 9, 0, 0);
+(30, 0, 10, 1, 1),
+(31, 1, 10, 0, 1),
+(32, 2, 10, 0, 0),
+(33, 3, 10, 0, 0),
+(34, 4, 10, 0, 0),
+(35, 5, 10, 0, 0),
+(36, 6, 10, 0, 0),
+(37, 7, 10, 0, 0),
+(46, 0, 22, 0, 1),
+(47, 1, 22, 0, 1),
+(48, 2, 22, 0, 1),
+(49, 3, 22, 0, 1),
+(50, 4, 22, 0, 1),
+(51, 5, 22, 0, 1),
+(52, 6, 22, 0, 1),
+(53, 7, 22, 0, 1);
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `mcu`
+--
+ALTER TABLE `mcu`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `member`
@@ -110,10 +140,12 @@ ALTER TABLE `member`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `node`
+-- Indexes for table `node_active`
 --
-ALTER TABLE `node`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `node_active`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `MCU_ID` (`mcu_id`),
+  ADD KEY `PIN_ID` (`pin_id`);
 
 --
 -- Indexes for table `pin`
@@ -127,29 +159,41 @@ ALTER TABLE `pin`
 --
 
 --
+-- AUTO_INCREMENT for table `mcu`
+--
+ALTER TABLE `mcu`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+--
 -- AUTO_INCREMENT for table `member`
 --
 ALTER TABLE `member`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
--- AUTO_INCREMENT for table `node`
+-- AUTO_INCREMENT for table `node_active`
 --
-ALTER TABLE `node`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+ALTER TABLE `node_active`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 --
 -- AUTO_INCREMENT for table `pin`
 --
 ALTER TABLE `pin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 --
 -- Constraints for dumped tables
 --
 
 --
+-- Constraints for table `node_active`
+--
+ALTER TABLE `node_active`
+  ADD CONSTRAINT `MCU_ID` FOREIGN KEY (`mcu_id`) REFERENCES `mcu` (`id`),
+  ADD CONSTRAINT `PIN_ID` FOREIGN KEY (`pin_id`) REFERENCES `pin` (`id`);
+
+--
 -- Constraints for table `pin`
 --
 ALTER TABLE `pin`
-  ADD CONSTRAINT `node_id` FOREIGN KEY (`node_id`) REFERENCES `node` (`id`);
+  ADD CONSTRAINT `node_id` FOREIGN KEY (`node_id`) REFERENCES `mcu` (`id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
