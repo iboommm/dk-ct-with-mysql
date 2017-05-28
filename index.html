@@ -62,7 +62,7 @@
                             <div class="row">
                                 <div class="col-md-8 text-left">
                                     Name :
-                                    <input type="text" ng-model="a.name" ng-change="update()" /> 
+                                    <input type="text" ng-model="a.name" ng-change="update()" />
                                     <span class="badge badge-default">IP : {{ a.ip }}</span>
                                 </div>
                                 <div class="col-md-4 text-right">
@@ -181,6 +181,29 @@
               </div>
               <div class="modal-footer">
                 <button class="btn btn-primary" ng-click="updateMachine()"> <i class="fa fa-check"></i> Update</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
+              </div>
+          </div>
+        </div>
+    </div>
+    <div class="modal fade" id="changePassword" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Change Password</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                    <div class="form-group">
+                      Old Password : <input type="password" placeholder="Enter Old password" ng-model="password.old" class="form-control"><br />
+                      New Password : <input type="password" placeholder="Enter New password" ng-model="password.new" class="form-control"><br />
+                      Repeat Password : <input type="password" placeholder="Enter Re-new password" ng-model="password.renew" class="form-control">
+                    </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-primary" ng-click="changePasswordAction()"> <i class="fa fa-check"></i> Update</button>
                   <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
               </div>
           </div>

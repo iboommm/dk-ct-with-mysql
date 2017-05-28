@@ -73,6 +73,14 @@
     echo $core->updateMCU($encode);
   });
 
+  Flight::route('POST /changePassword', function(){
+    $rawData = file_get_contents("php://input");
+    $encode = json_decode($rawData);
+    $core = new Core();
+    echo $core->changePassword($encode);
+  });
+
+
 
 
   Flight::start();

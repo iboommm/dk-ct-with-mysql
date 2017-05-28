@@ -164,6 +164,45 @@ class Core extends Medoo {
 
     }
 
+    function getMemberID($user) {
+      $userID = $this->database->get("member",[ 'id'] ,[
+        	"username" => $user
+        ]);
+        return $userID;
+
+    }
+
+    function changePassword($data) {
+      if($data->password->new != $data->password->renew) {
+        echo "NOT_MATCH";
+        return;
+      }else if($data->password->new ==  "" || $data->password->renew == "") {
+        echo "NOT_NULL";
+        return;
+      }else {
+        $password = md5($data->password->old);
+        if ($this->database->has("member", [
+          	"AND" => [
+              "username" => $data->username,
+          		"password" => $password
+          	]
+          ])) {
+            $data = $this->database->update("member", [
+              	"password" => md5($data->password->new)
+              ], [
+              	"id" => $this->getMemberID($data->username)
+              ]);
+              if($data == true) {
+                echo "SUCCESS";
+              }else {
+                echo "ERROR";
+              }
+          } else {
+          	echo "Password error.";
+          }
+      }
+    }
+
 
   }
 

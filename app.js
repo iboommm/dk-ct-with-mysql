@@ -13,6 +13,7 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   app.newNode = "";
   app.newIP = "";
   app.newPin = 8;
+  app.password = {old:"",new:"",renew:""};
 
   this.initial = function() {
     if(localStorageService.isSupported) {
@@ -130,6 +131,32 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
     )
   }
 
+  app.changePasswordAction = function() {
+      var data = {password: app.password,username: app.username};
+      var promise = $http.post("api/changePassword",data);
+      promise.then(
+        function(respond) {
+          console.log(respond.data);
+          if(respond.data == "SUCCESS") {
+            Notification.success('Update Password Success');
+            app.password = {old:"",new:"",renew:""};
+            $("#changePassword").modal('hide');
+          }else if(respond.data == "NOT_MATCH") {
+            Notification.error('Password not match');
+          }else if(respond.data == "NOT_NULL") {
+            Notification.error('Please enter Password');
+          }else if(respond.data == "ERROR") {
+            Notification.error('ERROR');
+          }
+        }
+      )
+      promise.catch(
+        function() {
+            console.log("err");
+        }
+      )
+  }
+
   app.updateMachine = function() {
     var data = {mcu:app.mcu};
     var promise = $http.post("api/updateMachine",data);
@@ -214,6 +241,10 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   app.confirmDeleteNode = function(node) {
     $("#confirmDeleteNode").modal("show");
     app.removeTMP = node;
+  }
+
+  app.changePassword = function() {
+    $('#changePassword').modal("show");
   }
 
   app.cancelRemove = function() {
