@@ -49,6 +49,7 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
         console.log(respond.data);
         if(respond.data.status == "true") {
           self.loadNode();
+          self.loadMCU();
           localStorageService.set("session", respond.data.session);
           localStorageService.set("username", respond.data.username);
           app.username = localStorageService.get("username");
