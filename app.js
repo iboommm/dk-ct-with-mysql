@@ -13,7 +13,7 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   app.newNode = "";
   app.newIP = "";
   app.newPin = 8;
-  app.password = {old:"",new:"",renew:""};
+  app.passwordChange = {old:"",new:"",renew:""};
 
   this.initial = function() {
     if(localStorageService.isSupported) {
@@ -43,7 +43,7 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
 
   app.login = function() {
     var data = {username:app.username,password:app.password};
-    // console.log(data);
+     console.log("login()",data);
     var promise = $http.post("api/login",data);
     promise.then(
       function(respond) {
@@ -132,14 +132,14 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   }
 
   app.changePasswordAction = function() {
-      var data = {password: app.password,username: app.username};
+      var data = {password: app.passwordChange,username: app.username};
       var promise = $http.post("api/changePassword",data);
       promise.then(
         function(respond) {
           console.log(respond.data);
           if(respond.data == "SUCCESS") {
             Notification.success('Update Password Success');
-            app.password = {old:"",new:"",renew:""};
+            app.passwordChange = {old:"",new:"",renew:""};
             $("#changePassword").modal('hide');
           }else if(respond.data == "NOT_MATCH") {
             Notification.error('Password not match');
