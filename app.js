@@ -14,8 +14,20 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   app.newIP = "";
   app.newPin = 8;
   app.passwordChange = {old:"",new:"",renew:""};
+    
+  self.checkInstall = function() {
+      var promise = $http.get("install.lock");
+      promise.catch(
+        function(response) {
+            if(response.status == 404) {
+                location.href = "install/"
+            }
+        }
+      )
+  }
 
   this.initial = function() {
+    self.checkInstall();
     if(localStorageService.isSupported) {
       localStorageService.set("session", localStorageService.get("session") == null ? null:localStorageService.get("session"));
       console.log("OK");
@@ -273,8 +285,12 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   self.resetNewNode = function() {
     app.newNode = "";
   }
+  
+
 
 }]);
+
+
 
 
 app.config(function (localStorageServiceProvider,NotificationProvider) {

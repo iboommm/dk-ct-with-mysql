@@ -1,6 +1,8 @@
 <?php
 date_default_timezone_set("Asia/Bangkok");
 
+require_once("config.php");
+
 if (PHP_MAJOR_VERSION >= 7) {
     set_error_handler(function ($errno, $errstr) {
        return strpos($errstr, 'Declaration of') === 0;
@@ -21,10 +23,10 @@ class Core extends Medoo {
     $this->database = new Medoo([
     // required
       'database_type' => 'mysql',
-      'database_name' => 'dk_ct',
-      'server' => 'localhost',
-      'username' => 'root',
-      'password' => '',
+      'database_name' => constant("DBNAME"),
+      'server' =>  constant("DBHOST"),
+      'username' =>  constant("DBUSER"),
+      'password' =>  constant("DBPASS"),
       'charset' => 'utf8',
     ]);
   }
