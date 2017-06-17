@@ -1,6 +1,12 @@
 <?php
 date_default_timezone_set("Asia/Bangkok");
 
+if (PHP_MAJOR_VERSION >= 7) {
+    set_error_handler(function ($errno, $errstr) {
+       return strpos($errstr, 'Declaration of') === 0;
+    }, E_WARNING);
+}
+
   if(!defined('CORE')){
     exit("Access denied");
   }
