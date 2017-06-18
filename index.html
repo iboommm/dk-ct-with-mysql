@@ -92,13 +92,23 @@
                 </div>
                 <div class="modal-body">
                     <form>
-                        <div class="form-group">
+                        <div class="form-group" ng-show="mcu.length > 0">
                             <label for="new-name" class="form-control-label">Name :</label>
                             <input type="text" class="form-control" ng-model="newNode" placeholder="Enter name">
                         </div>
+                        <div class="form-group" ng-show="mcu.length == 0">
+                          <div class="alert alert-danger" role="alert">
+                            <strong>Error!</strong> Machine not found.
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="(node/8) == mcu.length">
+                          <div class="alert alert-danger" role="alert">
+                            <strong>Error!</strong> You can't add over size of Machine.<br /> Please add Machine.
+                            </div>
+                        </div>
                     </form>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" ng-if="mcu.length > 0">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle" aria-hidden="true"></i> Close</button>
                     <button type="button" class="btn btn-primary" ng-click="addNode()"><i class="fa fa-check-circle" aria-hidden="true"></i> Submit</button>
                 </div>
