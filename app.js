@@ -14,7 +14,7 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   app.newIP = "";
   app.newPin = 8;
   app.passwordChange = {old:"",new:"",renew:""};
-    
+
   self.checkInstall = function() {
       var promise = $http.get("install.lock");
       promise.catch(
@@ -82,7 +82,6 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
         });
         app.node = respond.data;
         Notification.success('Load Node Success');
-        // console.log("1" , app.node);
       }
     )
     promise.catch(
@@ -285,7 +284,7 @@ app.controller("controller",['$http','$scope','localStorageService','Notificatio
   self.resetNewNode = function() {
     app.newNode = "";
   }
-  
+
 
 
 }]);

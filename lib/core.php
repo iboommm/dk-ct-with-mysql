@@ -136,7 +136,9 @@ class Core extends Medoo {
     }
 
     public function removeNode($node_id) {
+      $pin_id = $this->database->get("node_active","pin_id",["id[=]" => $node_id]);
       $chkErr = $this->database->delete("node_active", ["id"=>$node_id]);
+      $this->database->update("pin",["status" => 0],["id"=> $pin_id]);
       if(!$chkErr) {
         return "false";
       }
@@ -157,6 +159,7 @@ class Core extends Medoo {
       $chkErr = true;
       $number = $this->database->select("pin","id",["status[!]" => 1]);
       $id = $number[array_rand($number,1)];
+      $this->database->update("pin",["status" => 1],["id"=> $id]);
 
       $mcu_id = $this->database->get("pin","node_id",["id[=]" => $id]);
 
